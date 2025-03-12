@@ -1,0 +1,7 @@
+# Ignore all .exe files in the project
+*.exe
+
+.ipynb
+
+# Ignore the specific file "Coursework Exercise 2025.pdf" in any directory
+**/Coursework Exercise 2025.pdf

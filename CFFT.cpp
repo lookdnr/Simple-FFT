@@ -6,8 +6,7 @@
 
 namespace fs = filesystem;
 
-
-FFT::FFT(){ // constructor to 
+FFT::FFT(){ // constructor
 
     // initialise vars
     initData = nullptr;
@@ -17,7 +16,6 @@ FFT::FFT(){ // constructor to
     k = 0;
 
 };
-
 
 FFT::FFT(const FFT& in){ // copy constructor
 
@@ -33,7 +31,6 @@ void FFT::getFile(){
     getFilenames(); // list file names
     cout << endl << "Enter a file to proceed with: ";
     
-
     // do while to check file read correctly
     do{
     cin >> filename;

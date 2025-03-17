@@ -9,36 +9,40 @@ using namespace std;
 
 namespace fs = filesystem;
 
-fileHandler::fileHandler(){ // initialise vars to avoid garbage values
+// constructor: initialise vars to avoid garbage values
+fileHandler::fileHandler(){ 
+    filename = "";
     rawData = nullptr;
     fileLen = 0;
 }
 
+// function to read file from user 
 void fileHandler::getFile(){
-    // request and pull data from file
+
     cout << "Hello!" << endl << "Here are the files in /data:" << endl << endl;
     getFilenames(); // list file names
-    cout << endl << "Enter a file to proceed with: ";
-    
+    cout << endl << "Enter a file to proceed with: ";   
 
     // do while to check file read correctly
     do{
-    cin >> filename;
+    cin >> filename; // get user input
     } while (!readFile());
 }
 
-void fileHandler::getFilenames(){ // function to print filenames from dir
+// function to print filenames from dir
+void fileHandler::getFilenames(){ 
     
     for (const auto & entry : fs::directory_iterator(path)) // after [1]
         cout << entry.path().filename() << "\n";
 }
 
-bool fileHandler::readFile(){ // function to read files & allocate memory
+// function to read files & allocate memory. is true when file is opened and data read sucessfully
+bool fileHandler::readFile(){ 
 
-    fstream dataFile;
-    dataFile.open(path + "/" + filename, fstream::in);
+    fstream dataFile; // fstream object to open file
+    dataFile.open(path + "/" + filename, fstream::in); // open file
 
-    if (dataFile.fail()){
+    if (dataFile.fail()){ // error handling for incorrect file name
         cout << "Please re-enter filename: ";
         return false;
     }
@@ -65,26 +69,38 @@ bool fileHandler::readFile(){ // function to read files & allocate memory
             rawData[i] = tempData[i];
         } 
         
-        return true;
+        return true; // success!
     }
-    return false;
+    return false; // something hasn't worked :(.
 }
 
+// getter for sharing raw data
+double* fileHandler::getRawData(){
+    return rawData;
+}
+
+// getter for sharing file length
+int fileHandler::getFileLen(){
+    return fileLen;
+}
+
+// setter to retreieve updated fileLen after FFT 
 void fileHandler::setFileLen(int input){
     fileLen = input;
     return;
 }
 
+// function to write processed data to file
 void fileHandler::writeFile(double** input, string outputName){
     
     // check if results dir exists and make if not
-    if (!fs::is_directory(path + filename + "_results")){
-        fs::create_directory(path + filename + "_results");
+    if (!fs::is_directory(path + "/" + filename + "_results")){
+        fs::create_directory(path + "/" + filename + "_results");
         cout << "Directory " << filename << "_results created!";
     }
 
     fstream outFile;
-    outFile.open(path + filename + "_results/" + outputName + ".txt", fstream::out);
+    outFile.open(path + "/" + filename + "_results/" + outputName + ".txt", fstream::out);
 
     // write to files
     for (int i = 0; i < fileLen/2; i++) { // only write first half to avoid redundancies
@@ -94,14 +110,6 @@ void fileHandler::writeFile(double** input, string outputName){
     outFile.close();
 
     return;
-}
-
-double* fileHandler::getRawData(){
-    return rawData;
-}
-
-int fileHandler::getFileLen(){
-    return fileLen;
 }
 
 fileHandler::~fileHandler(){

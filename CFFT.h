@@ -1,18 +1,14 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <cmath>
 #include <filesystem>
 
 using namespace std;
 namespace fs = filesystem;
 
-class FFT {
+class FFT { // implements the main FFT routine 
 
     public:
 
         FFT(); // constructor to pull file
-        FFT(const FFT &in); // copy constructor
         ~FFT(); // destructor to save file and de-allocate
 
         // main FFT functions
@@ -26,7 +22,7 @@ class FFT {
 
     private:
         int fileLen; // to store num lines
-        // to store padded data (which becomes the acc spectra) and other spectra
+        // to store padded data (which becomes the acc spectra) and other spectra:
         double** padData,** velocitySpectrum,** displacementSpectrum; 
 
 };

@@ -6,11 +6,11 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-class fileHandler {
+class fileHandling { // to handle reading and writing to files
     public:
 
-        fileHandler(); // constructor to initialise variables
-        ~fileHandler(); // destructor to deallocate
+        fileHandling(); // constructor to initialise variables
+        ~fileHandling(); // destructor to deallocate
 
         void getFile(); // to request filename
         void getFilenames(); // to list filenames to user

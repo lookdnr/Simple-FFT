@@ -1,19 +1,16 @@
 #include "CFFT.h"
 #include <iostream>
-#include <filesystem>
-#include <fstream>
 #include <cmath>
 
-namespace fs = filesystem;
-
-FFT::FFT(){ // constructor 
+// constructor: initialise variables to avoid garbage values
+FFT::FFT(){ 
     fileLen = 0;
+    padData = nullptr;
+    velocitySpectrum = nullptr;
+    displacementSpectrum = nullptr;
 };
 
-FFT::FFT(const FFT& in){ // copy constructor
-
-}
-
+// setter to retrieve fileLen from fileHandler routine
 void FFT::setFileLen(int input){
     fileLen = input;
     return;
@@ -42,7 +39,8 @@ void FFT::zeroPadding(double* data, int arrayLen) {
     }
 }
 
-void FFT::paddedMemory(double* data, int nextPow){
+// function to allocate memory for padded array
+void FFT::paddedMemory(double* data, int nextPow){ 
     padData = new double*[nextPow]; 
     
     for (int i = 0; i < nextPow; i++){
@@ -50,8 +48,8 @@ void FFT::paddedMemory(double* data, int nextPow){
     }
 
     for (int i = 0; i < fileLen; i++){
-        padData[i][0] = data[i];  // Transfer real data
-        padData[i][1] = 0.;          // no imag data in input
+        padData[i][0] = data[i]; // Transfer real data
+        padData[i][1] = 0.; // no imag data in input
     }
 
     fileLen = nextPow; // update array length record
@@ -59,7 +57,7 @@ void FFT::paddedMemory(double* data, int nextPow){
 
 void FFT::computeFFT(double** input, int len, int dirFlag) { // implementation after [3]
 
-    // bit reversal routine (divide)
+    // first, divide: bit reversal routine
     int j = 0;
     for (int i = 1; i < len; i++) {
         int bit = len >> 1;
@@ -74,32 +72,36 @@ void FFT::computeFFT(double** input, int len, int dirFlag) { // implementation a
         }
     }
 
-    // (conquer)
-    for (int step = 2; step <= len; step *= 2) {
-        double angle = dirFlag * (2 * M_PI / step); // note dirFlag is -1 for fwd, 1 for inverse
-        double w_real = cos(angle);
-        double w_imag = sin(angle);
+    // next, conquer: compute twiddle factors and apply in butterfly operations 
+    for (int step = 2; step <= len; step *= 2) { // step: size of merging subarray
+        
+        double angle = dirFlag * (2 * M_PI / step); // phase angle. note dirFlag is -1 for fwd, 1 for inverse
+        double w_real = cos(angle); // real part of twiddle
+        double w_imag = sin(angle); // imag part of twiddle
+        // u_: current twiddle factor, 
+        // temp_real/imag: temp storage for multiplied components
+        // u_w_: temp storage for updated twiddle 
         double u_real, u_imag, temp_real, temp_imag, temp_w_real;
-        int index1, index2;
+        int index1, index2; // to index the array
 
         for (int k = 0; k < len; k += step) {
             u_real = 1.0;
             u_imag = 0.0;
             for (int j = 0; j < step / 2; j++) {
-                index1 = k + j;
-                index2 = k + j + step / 2;
+                index1 = k + j; // even element
+                index2 = k + j + step / 2; // odd element
 
-                // twiddle * odd part
+                // twiddle * odd part: temp_ hold odd element adjusted by twiddle multiplication
                 temp_real = u_real * input[index2][0] - u_imag * input[index2][1];
                 temp_imag = u_real * input[index2][1] + u_imag * input[index2][0];
 
-                // butterfly op
+                // butterfly operation: in-place updates
                 input[index2][0] = input[index1][0] - temp_real;
                 input[index2][1] = input[index1][1] - temp_imag;
                 input[index1][0] += temp_real;
                 input[index1][1] += temp_imag;
 
-                // update twiddle
+                // update twiddle factor
                 temp_w_real = u_real * w_real - u_imag * w_imag;
                 u_imag = u_real * w_imag + u_imag * w_real;
                 u_real = temp_w_real;
@@ -114,15 +116,18 @@ void FFT::computeFFT(double** input, int len, int dirFlag) { // implementation a
     }
 }
 
+// getter to share updated len with other classes
 int FFT::getPaddedLen(){
     return fileLen;
 }
 
+// getter to share acc spectrum with other classes
 double** FFT::getAcc(){
     return padData;
 }
 
-FFT::~FFT(){ // destructor to deallocate memory
+// destructor to deallocate memory
+FFT::~FFT(){ 
 
     for (int i = 0; i < fileLen; i++) {
         delete[] padData[i];

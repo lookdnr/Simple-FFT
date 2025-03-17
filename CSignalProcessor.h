@@ -1,6 +1,6 @@
 #pragma once
 
-class signalProcessor{
+class signalProcessor { // to manipulate the signal: integration, windowing, computing amplitudes
     public:
 
         signalProcessor(); // constructor to initialise vars
@@ -16,7 +16,7 @@ class signalProcessor{
         double** getVelTime(); // getter for vel in time domain
         double** getDispTime(); // getter for disp in time domain
         void setAcc(double** input); // setter for acceleration spectrum
-        void setFileLen(int input); // setter for filelen
+        void setFileLen(const int input); // setter for filelen
 
     private:
         double** accSpectrum,** velSpectrum, ** dispSpectrum, ** velocityTime, **displacementTime;

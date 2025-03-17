@@ -10,7 +10,7 @@ int main(){
 
     // create an instance of all neccesary class objects:
     FFT fft; 
-    fileHandler fileHandling; 
+    fileHandling fileHandling; 
     userInput input; 
     signalProcessor signal; 
 

@@ -1,9 +1,6 @@
 #pragma once
-#include <iostream>
 
-using namespace std;
-
-class userInput{
+class userInput { // to deal with collecting user parameters
     public:
         userInput(); // constructor to initialise variables
 

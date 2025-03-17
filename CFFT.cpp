@@ -6,120 +6,43 @@
 
 namespace fs = filesystem;
 
-FFT::FFT(){ // constructor
-
-    // initialise vars
-    initData = nullptr;
-    padData = nullptr;
+FFT::FFT(){ // constructor 
     fileLen = 0;
-    f_s = 0.;
-    k = 0;
-
 };
 
 FFT::FFT(const FFT& in){ // copy constructor
 
-    initData = in.initData;
-    padData = in.padData;
-    filename = in.filename;
 }
 
-void FFT::getFile(){
-    // request and pull data from file
-    cout << "Hello!" << endl << "Here are the files in /data:" << endl << endl;
-    cout << endl << fs::current_path() << endl;
-    getFilenames(); // list file names
-    cout << endl << "Enter a file to proceed with: ";
-    
-    // do while to check file read correctly
-    do{
-    cin >> filename;
-    } while (!readFile());
-}
-
-void FFT::getFilenames(){ // function to print filenames from dir
-    
-    for (const auto & entry : fs::directory_iterator(path)) // after [1]
-        cout << entry.path().filename() << "\n";
-}
-
-
-bool FFT::readFile(){ // function to read files & allocate memory
-
-    fstream dataFile;
-    dataFile.open(path + filename, fstream::in);
-
-    if (dataFile.fail()){
-        cout << "Please re-enter filename: ";
-        return false;
-    }
-
-    else{
-        vector<double> tempData; // temp vector for quick swap
-        double value;
-        double _; // place holder for 1st column
-
-        string skipLine;
-        for (int i = 0; i < 5 && getline(dataFile, skipLine); i++); // to skip first 5 lines
-    
-
-        while (dataFile >> _ >> value) {  // read accelerations from file
-            tempData.push_back(value); // append to vector
-        }
-        
-        dataFile.close();
-        fileLen = tempData.size();
-
-        initData = new double[fileLen]; // allocate memory
-
-        // give data to array
-        for (size_t i = 0; i < fileLen; i++) {
-            initData[i] = tempData[i];
-        } 
-        
-        return true;
-    }
-    return false;
-}
-
-void FFT::getUserParameters(){
-    cout << "Enter the sampling frequency (Hz): ";
-    
-    while (!(cin >> f_s) || (f_s <= 0.)){ // if f_s not numeric or negative- keep looping till correct
-        cout << endl << "s.f. must be a number >0 in Hz. Re-enter: ";
-        cin.clear(); 
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // reset failbit (after [2])
-    }
-
-    cout << endl << "This routine uses a Hann window to control spectral leakage." << endl;
-    cout << "The tapering constant k controls the strength of the windowing, where k = 1 is the"; 
-    cout << " standard window, 0 windows the entire data set, and 2 doubles the windowing effect." << endl;
-    cout << "Enter a tapering factor k (put 1 if unsure): ";
-    
-    while (!(cin >> k) || (k <= 0.)){ // if k not numeric or negative- keep looping till correct 
-        cout << endl << "k must be a number between 0 and 1. Re-enter: ";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // reset failbit (after [2])
-    }
+void FFT::setFileLen(int input){
+    fileLen = input;
+    return;
 }
 
 // Function to pad array with zeros
-void FFT::zeroPadding(){ 
+void FFT::zeroPadding(double* data, int arrayLen) { 
+    double n = log2(arrayLen); // log base 2 of fileLen
+    int int_n = (int)round(n); // nearest integer to n
+    int nextPow = arrayLen; // default value for no padding
 
-    double n = log2(fileLen); // log of base 2
-
-    n = ceil(n); // round to next whole number
-    const int nextPow = pow(2, n); // find next number to base 2
-    paddedMemory(nextPow); // allocate memory and transfer data
+    if (arrayLen != (int)pow(2, int_n)) { // if fileLen is not a power of 2
+        int_n = ceil(n); // round up to next integer
+        nextPow = pow(2, int_n); // find next power of 2
+        paddedMemory(data, nextPow); // allocate memory for padded size
+    } 
     
-    for (int i = fileLen; i < nextPow; i++){ // pad from end of data to next pow of 2
-        padData[i][0] = 0; // pad with zeroes
-        padData[i][1] = 0;
+    else { // if fileLen is already a power of 2
+        paddedMemory(data, nextPow); // allocate memory for current size
     }
     
+    // loop and pad with zeros from the original file len to the end
+    for (int i = fileLen; i < nextPow; i++) {
+        padData[i][0] = 0; // pad real part with zero
+        padData[i][1] = 0; // pad imaginary part with zero
+    }
 }
 
-void FFT::paddedMemory(int nextPow){
+void FFT::paddedMemory(double* data, int nextPow){
     padData = new double*[nextPow]; 
     
     for (int i = 0; i < nextPow; i++){
@@ -127,11 +50,9 @@ void FFT::paddedMemory(int nextPow){
     }
 
     for (int i = 0; i < fileLen; i++){
-        padData[i][0] = initData[i];  // Transfer real data
+        padData[i][0] = data[i];  // Transfer real data
         padData[i][1] = 0.;          // no imag data in input
     }
-
-    delete[] initData; // de allocate memory for init data
 
     fileLen = nextPow; // update array length record
 }
@@ -153,7 +74,7 @@ void FFT::computeFFT(double** input, int len, int dirFlag) { // implementation a
         }
     }
 
-    // Cooley-Tukey portion (conquer)
+    // (conquer)
     for (int step = 2; step <= len; step *= 2) {
         double angle = dirFlag * (2 * M_PI / step); // note dirFlag is -1 for fwd, 1 for inverse
         double w_real = cos(angle);
@@ -193,128 +114,18 @@ void FFT::computeFFT(double** input, int len, int dirFlag) { // implementation a
     }
 }
 
-void FFT::velDispMemory(){
-    velocityTime = new double*[fileLen];
-    displacementTime = new double*[fileLen];
-
-    for (int i = 0; i < fileLen; i++){
-        velocityTime[i] = new double[2];
-        displacementTime[i] = new double[2];
-    }
-
-    // copy data over. At this stage [:, 0] is real and [:, 1] is imag.
-    for (int i = 0; i < fileLen; i++){
-        velocityTime[i][0] = velocitySpectra[i][0];
-        displacementTime[i][0] = displacementSpectra[i][0];
-        
-        velocityTime[i][1] = velocitySpectra[i][1];
-        displacementTime[i][1] = displacementSpectra[i][1];
-    } // now we have something to hold our inverse transf.
+int FFT::getPaddedLen(){
+    return fileLen;
 }
 
-void FFT::integrate(){
-
-    // assign memory to vel and disp arrays
-    velocitySpectra = new double*[fileLen];
-    displacementSpectra = new double*[fileLen];
-
-    for (int i = 0; i < fileLen; i++){
-        velocitySpectra[i] = new double[2];
-        displacementSpectra[i] = new double[2]; 
-    }
-
-    // now perform the integration using the property of the Fourier Tranform
-    for (int i = 0; i < fileLen; i++){
-        double fstep = i * f_s/fileLen;
-        double factor = 2*M_PI*fstep; // 2pi f
-        double sqrFactor = factor*factor; // -4pisqr fsqr
-
-        if (fstep == 0) { // handle zero case
-            velocitySpectra[i][0] = 0;
-            velocitySpectra[i][1] = 0;
-            displacementSpectra[i][0] = 0;
-            displacementSpectra[i][1] = 0;
-        }
-
-        else { 
-            velocitySpectra[i][0] = padData[i][1] / factor; // real
-            velocitySpectra[i][1] = -padData[i][0] / factor; // imag
-
-            displacementSpectra[i][0] = -padData[i][0] / sqrFactor;
-            displacementSpectra[i][1] = -padData[i][1] / sqrFactor;
-        }
-    }
+double** FFT::getAcc(){
+    return padData;
 }
 
-// to receive Nx2 arrays with 1 row real 1 row imag and replace with 1 row magnitude 1 row frequency
-double** FFT::computeAmplitudes(double** array, int dirFlag){
-    double realSqr, imagSqr, fStep, tStep;
-    for (int i = 0; i < fileLen; i++){
-        
-        realSqr = pow(array[i][0], 2);
-        imagSqr = pow(array[i][1], 2);
-        fStep = i * (f_s/fileLen);
-        tStep = 1/f_s;
-
-        if (dirFlag == 1) {
-            array[i][1] = i*tStep; // only append time, leave real part unchanged
-        }
-
-        else{ 
-            array[i][0] = sqrt(realSqr + imagSqr); // compute mag for forward transf.
-            array[i][1] = fStep; // compute freq bin and record for fwd transf.
-        }
-    }
-    return array;
-}
-
-// windowing function to reduce extreme values caused by small omega in the inverse transform
-void FFT::hannWindow(){ 
-    double window;
-    for (int n = 0; n < fileLen; n++){
-        window = k*0.5*(1 - cos(2*M_PI*n/fileLen)); // k is user entered tappering constant. 1 if standard Hann window
-        velocitySpectra[n][0] *= window;
-        displacementSpectra[n][0] *= window;
-        velocityTime[n][0] *= window;
-        displacementTime[n][0] *= window;
-    }
-}
-
-void FFT::writeFile(double** input, string outputName){
-    
-    // check if results dir exists and make if not
-    if (!fs::is_directory(path + filename + "_results")){
-        fs::create_directory(path + filename + "_results");
-        cout << "Directory " << filename << "_results created!";
-    }
-
-    fstream outFile;
-    outFile.open(path + filename + "_results/" + outputName + ".txt", fstream::out);
-
-    // write to files
-    for (int i = 0; i < fileLen/2; i++) { // only write first half to avoid redundancies
-        outFile << input[i][0] << '\t';
-        outFile << input[i][1] << '\n';
-    }
-    outFile.close();
-
-    return;
-}
-
-FFT::~FFT(){ // destructor 
-
-    // de allocate memory now that we are done with it
+FFT::~FFT(){ // destructor to deallocate memory
 
     for (int i = 0; i < fileLen; i++) {
         delete[] padData[i];
-        delete[] velocitySpectra[i];
-        delete[] displacementSpectra[i];
-        delete[] velocityTime[i];
-        delete[] displacementTime[i];
     }
     delete[] padData;
-    delete[] velocitySpectra;
-    delete[] displacementSpectra; 
-    delete[] velocityTime;
-    delete[] displacementTime;
 }

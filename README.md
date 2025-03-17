@@ -1,7 +1,7 @@
 # C++ Coursework: Seismogram Processing Using the Cooley-Tukey FFT Algorithm and Numerical Integration
 
-**Author**: Luke Dinsdale (02205881)  
-**Date**: March 2025  
+**Author**: Luke Dinsdale (02205881)
+**Date**: March 2025
 
 ---
 
@@ -11,23 +11,23 @@ I have written a program that reads single-component seismograms from a file and
 
 ## Background
 
-The Discrete Fourier Transform (DFT) of $$  N  $$ data points can be written as:
+The Discrete Fourier Transform (DFT) of $N$ data points can be written as:
 
-$$   F[k] = \sum_{n=0}^{N-1} t_n e^{-i 2\pi \frac{k}{N} n}, \quad k = 0, 1, \dots, N-1,   $$
+$$ F[k] = \sum_{n=0}^{N-1} t_n e^{-i 2\pi \frac{k}{N} n}, \quad k = 0, 1, \dots, N-1,$$
 
-where $$  t_n  $$ is the signal value at the $$  n  $$-th time sample, and $$  F[k]  $$ is the complex amplitude at the $$  k  $$-th frequency bin. The frequency of the $$  k  $$-th bin is $$  f_k = \frac{k f_s}{N}  $$, where $$  f_s  $$ is the sampling frequency, and the twiddle factor is:
+where $t_n$ is the signal value at the $n$-th time sample, and $F[k]$ is the complex amplitude at the $k$-th frequency bin. The frequency of the $k$-th bin is $f_k = \frac{k f_s}{N}$, where $$f_s$$ is the sampling frequency, and the twiddle factor is:
 
-$$   e^{-i 2\pi \frac{k}{N} n} = \cos\left(2\pi \frac{k}{N} n\right) - i \sin\left(2\pi \frac{k}{N} n\right).   $$
+$$ e^{-i 2\pi \frac{k}{N} n} = \cos\left(2\pi \frac{k}{N} n\right) - i \sin\left(2\pi \frac{k}{N} n\right). $$
 
-This direct implementation, often called the *naive* DFT, requires $$  N  $$ operations for each of the $$  k  $$ frequency bins, leading to a time complexity of $$  O(N^2)  $$, which is extremely inefficient for large $$  N  $$. The [Cooley-Tukey algorithm](https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm), or *fast* FT, addresses this by splitting the summation into smaller sub-problems, considering the even ($$  t_{2r}  $$) and odd ($$  t_{2r+1}  $$) parts separately:
+This direct implementation, often called the *naive* DFT, requires $N$ operations for each of the $k$ frequency bins, leading to a time complexity of $O(N^2)$, which is extremely inefficient for large $N$. The [Cooley-Tukey algorithm](https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm), or *fast* FT, addresses this by splitting the summation into smaller sub-problems, considering the even ($t_{2r}$) and odd ($t_{2r+1}$) parts separately:
 
-$$   F[k] = \sum_{r=0}^{\frac{N}{2}-1} t_{2r} e^{-i 2\pi \frac{r k}{N}} + e^{-i 2\pi \frac{k}{N}} \sum_{r=0}^{\frac{N}{2}-1} t_{2r+1} e^{-i 2\pi \frac{r k}{N}},   $$
+$$ F[k] = \sum_{r=0}^{\frac{N}{2}-1} t_{2r} e^{-i 2\pi \frac{r k}{N}} + e^{-i 2\pi \frac{k}{N}} \sum_{r=0}^{\frac{N}{2}-1} t_{2r+1} e^{-i 2\pi \frac{r k}{N}}, $$
 
-where $$  \omega_N^k = e^{-i 2\pi \frac{k}{N}}  $$. This approach divides the $$  N  $$-point DFT into two $$  N/2  $$-point DFTs. If $$  N = 2^n  $$, $$  n \in \mathbb{N}  $$, the algorithm can recursively or iteratively divide a DFT problem into smaller sub-problems. By exploiting the symmetry and periodicity of the transform, it reduces the time complexity to $$  O(N \log N)  $$, providing a viable method for computing the Fourier Transform of discrete time-domain data for large $$  N  $$.
+where $\omega_N^k = e^{-i 2\pi \frac{k}{N}}$. This approach divides the $N$-point DFT into two $N/2$-point DFTs. If $N = 2^n$, $n \in \mathbb{N}$, the algorithm can recursively or iteratively divide a DFT problem into smaller sub-problems. By exploiting the symmetry and periodicity of the transform, it reduces the time complexity to $O(N \log N)$, providing a viable method for computing the Fourier Transform of discrete time-domain data for large $N$.
 
 We can also leverage the frequency-domain integration property of the Fourier Transform:
 
-$$   \mathscr{F} \left\{ \int f(t) \, dt \right\} = \frac{F(\omega)}{i \omega}.   $$
+$$ \mathscr{F} \left[ \int f(t) \, dt \right] = \frac{F(\omega)}{i \omega}. $$
 
 This avoids the iterative approach required for time-domain integration, replacing it with simple algebraic operations, allowing efficient computation of velocity and displacement spectra from acceleration data.
 
@@ -37,7 +37,7 @@ This avoids the iterative approach required for time-domain integration, replaci
 
 ## User Guide
 
-The program requires three inputs from the user: a file name from those listed in the terminal, a sampling frequency $$  f_s  $$, and a tapering constant to control windowing (see [Windowing](#windowing)). Error handling prevents crashes on invalid entries, but users must determine appropriate values for $$  f_s  $$ and the tapering constant.
+The program requires three inputs from the user: a file name from those listed in the terminal, a sampling frequency $f_s$, and a tapering constant to control windowing (see [Windowing](#windowing)). Error handling prevents crashes on invalid entries, but users must determine appropriate values for $f_s$ and the tapering constant.
 
 ### Example Usage
 
@@ -57,14 +57,14 @@ Enter `>> Loma_Prieta.dat` (not case-sensitive, but include the extension). Then
 
 `>> Enter a sampling frequency (Hz): `
 
-From `Loma_Prieta.dat`, the sampling frequency is 100 Hz, so enter `>> 100`. $$  f_s  $$ must be a number greater than zero. The algorithm ignores redundancies due to central symmetry, so the peak output frequency is the Nyquist frequency ($$  f_s / 2  $$) by design.
+From `Loma_Prieta.dat`, the sampling frequency is 100 Hz, so enter `>> 100`. $f_s$ must be a number greater than zero. The algorithm ignores redundancies due to central symmetry, so the peak output frequency is the Nyquist frequency ($f_s / 2$) by design.
 
 Next, the program provides information about the tapering constant and prompts:
 
 `Enter a tapering constant k (put 1 if unsure): `
 
 
-For this example, $$  k = 1  $$ was used, so enter `>> 1`. $$  k  $$ must be greater than zero.
+For this example, $k = 1$ was used, so enter `>> 1`. $k$ must be greater than zero.
 
 The program processes the data, creates a results directory if needed, and exits upon completion.
 
@@ -83,12 +83,12 @@ Data are passed between classes using getters and setters to maintain encapsulat
 
 ### Workflow
 
-1. Two-column data are read from a user-specified file into a vector and copied into an $$  N \times 1  $$ array.
-2. $$  f_s  $$ and tapering parameter $$  k  $$ are read from the user.
-3. Data are transferred to an $$  N \times 2  $$ array of pointers, padded with zeros to length $$  2^n  $$. The first column is the real component, the second is imaginary (all zero for raw data).
+1. Two-column data are read from a user-specified file into a vector and copied into an $N \times 1$ array.
+2. $f_s$ and tapering parameter $k$ are read from the user.
+3. Data are transferred to an $N \times 2$ array of pointers, padded with zeros to length $2^n$. The first column is the real component, the second is imaginary (all zero for raw data).
 4. The forward FFT is computed using the "divide and conquer" method: a bit reversal stage orders the data, followed by a butterfly operation stage recombining odd and even parts, with twiddle factors updated iteratively.
-5. Data are integrated using the Fourier transform’s integration property, storing velocity and displacement spectra in new $$  N \times 2  $$ arrays.
-6. Velocity and displacement spectra undergo an inverse FFT to obtain time-domain records, stored in new $$  N \times 2  $$ arrays.
+5. Data are integrated using the Fourier transform’s integration property, storing velocity and displacement spectra in new $N \times 2$ arrays.
+6. Velocity and displacement spectra undergo an inverse FFT to obtain time-domain records, stored in new $N \times 2$ arrays.
 7. Amplitudes are computed and assigned to frequency or time increment bins.
 8. Data are windowed (see [Windowing](#windowing)) to combat spectral leakage.
 9. If no results directory exists, one is created. Spectra and time-domain outputs are written to labeled `.txt` files.
@@ -111,11 +111,11 @@ Data are passed between classes using getters and setters to maintain encapsulat
 
 #### Windowing
 
-The routine applies a [Hann window](https://en.wikipedia.org/wiki/Hann_function) to combat spectral leakage from resampling to $$  N = 2^n  $$ and to mitigate extreme values from dividing by small $$  \omega  $$ in integration. The function `hannWindow()` implements:
+The routine applies a [Hann window](https://en.wikipedia.org/wiki/Hann_function) to combat spectral leakage from resampling to $N = 2^n$ and to mitigate extreme values from dividing by small $\omega$ in integration. The function `hannWindow()` implements:
 
-$$   f_n(\bullet) = f_n(\bullet) \cdot k \cdot 0.5 \left(1 - \cos\left(\frac{2\pi n}{N}\right)\right),   $$
+$$ f_n(\bullet) = f_n(\bullet) \cdot k \cdot 0.5 \left(1 - \cos\left(\frac{2\pi n}{N}\right)\right), $$
 
-where $$  k  $$ is a user-input tapering constant, $$  k \in \mathbb{R}, k \geq 0  $$. When $$  k = 1  $$, it’s the standard Hann window; $$  0 \leq k < 1  $$ reduces tapering, and $$  k > 1  $$ increases it linearly (e.g., $$  k = 2  $$ doubles the effect).
+where $k$ is a user-input tapering constant, $k \in \mathbb{R}, k \geq 0$. When $k = 1$, it’s the standard Hann window; $0 \leq k < 1$ reduces tapering, and $k > 1$ increases it linearly (e.g., $k = 2$ doubles the effect).
 
 #### File Formatting
 

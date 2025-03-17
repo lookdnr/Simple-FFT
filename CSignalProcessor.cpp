@@ -1,3 +1,14 @@
+/*
+C++ Coursework: FFT implementation
+File: implementation file for the signalProcessor class
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the implementation file for the member functions of the signalProcessor class.
+The functions perform numerical integration in the frequency domain, window the 
+data post-FFT, and compute the amplitudes of the data.
+*/
+
 #include "CSignalProcessor.h"
 #include <cmath>
 
@@ -9,7 +20,6 @@ signalProcessor::signalProcessor(){
     dispSpectrum = nullptr;
     velocityTime = nullptr;
     displacementTime = nullptr;
-
 }
 
 // setter for acceleration spectrum data

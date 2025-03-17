@@ -1,3 +1,12 @@
+/*
+C++ Coursework: FFT implementation
+File: FFT class implementation
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the implementation file for the member functions of the FFT class.
+*/
+
 #include "CFFT.h"
 #include <iostream>
 #include <cmath>

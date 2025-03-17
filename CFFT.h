@@ -1,3 +1,13 @@
+/*
+C++ Coursework: FFT implementation
+File: FFT class header file
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the header file which declares the member variables and functions
+which implement the FFT algorithm.
+*/
+
 #pragma once
 #include <filesystem>
 

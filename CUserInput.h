@@ -1,3 +1,14 @@
+/*
+C++ Coursework: FFT implementation
+File: header file for the userInput class
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the header file which declares the member functions and variables for the userInput
+class. The functions receive user inputted parameters which control the FFT routine
+and post processing procedures.
+*/
+
 #pragma once
 
 class userInput { // to deal with collecting user parameters

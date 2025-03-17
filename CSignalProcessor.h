@@ -1,3 +1,14 @@
+/*
+C++ Coursework: FFT implementation
+File: header file for the signalProcessor class
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the header file whichd eclares the member variables and functions of 
+the signalProcessor class. The functions perform numerical integration in the frequency
+domain, window the data post-FFT, and compute the amplitudes of the data.
+*/
+
 #pragma once
 
 class signalProcessor { // to manipulate the signal: integration, windowing, computing amplitudes

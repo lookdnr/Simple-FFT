@@ -1,3 +1,14 @@
+/*
+C++ Coursework: FFT implementation
+File: implementation file for the fileHandling class
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the implementation file of the fileHandling class. The functions list files 
+from the /data directory, read data from a user specified file, and write to output 
+files, creating a results directory where necesary.
+*/
+
 #include "CFileHandling.h"
 #include <iostream>
 #include <filesystem>
@@ -10,14 +21,14 @@ using namespace std;
 namespace fs = filesystem;
 
 // constructor: initialise vars to avoid garbage values
-fileHandler::fileHandler(){ 
+fileHandling::fileHandling(){ 
     filename = "";
     rawData = nullptr;
     fileLen = 0;
 }
 
 // function to read file from user 
-void fileHandler::getFile(){
+void fileHandling::getFile(){
 
     cout << "Hello!" << endl << "Here are the files in /data:" << endl << endl;
     getFilenames(); // list file names
@@ -30,14 +41,14 @@ void fileHandler::getFile(){
 }
 
 // function to print filenames from dir
-void fileHandler::getFilenames(){ 
+void fileHandling::getFilenames(){ 
     
-    for (const auto & entry : fs::directory_iterator(path)) // after [1]
+    for (const auto & entry : fs::directory_iterator(path)) // from StackExchange (see documentation)
         cout << entry.path().filename() << "\n";
 }
 
 // function to read files & allocate memory. is true when file is opened and data read sucessfully
-bool fileHandler::readFile(){ 
+bool fileHandling::readFile(){ 
 
     fstream dataFile; // fstream object to open file
     dataFile.open(path + "/" + filename, fstream::in); // open file
@@ -75,23 +86,23 @@ bool fileHandler::readFile(){
 }
 
 // getter for sharing raw data
-double* fileHandler::getRawData(){
+double* fileHandling::getRawData(){
     return rawData;
 }
 
 // getter for sharing file length
-int fileHandler::getFileLen(){
+int fileHandling::getFileLen(){
     return fileLen;
 }
 
 // setter to retreieve updated fileLen after FFT 
-void fileHandler::setFileLen(int input){
+void fileHandling::setFileLen(int input){
     fileLen = input;
     return;
 }
 
 // function to write processed data to file
-void fileHandler::writeFile(double** input, string outputName){
+void fileHandling::writeFile(double** input, string outputName){
     
     // check if results dir exists and make if not
     if (!fs::is_directory(path + "/" + filename + "_results")){
@@ -112,6 +123,6 @@ void fileHandler::writeFile(double** input, string outputName){
     return;
 }
 
-fileHandler::~fileHandler(){
+fileHandling::~fileHandling(){
     delete[] rawData; // de allocate memory for init data
 }

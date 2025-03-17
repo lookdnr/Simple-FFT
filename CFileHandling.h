@@ -1,3 +1,15 @@
+/*
+C++ Coursework: FFT implementation
+File: header file for the fileHandling class
+Author: Luke Dinsdale
+CID: 02285881
+
+This is the header file which declares the member variables and functions of
+the fileHandling class. The functions list files from the /data directory,
+read data from a user specified file, and write to output files, creating a results
+directory where necesary.
+*/
+
 #pragma once
 
 #include <string>

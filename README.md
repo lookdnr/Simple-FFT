@@ -1,6 +1,7 @@
 # C++ Coursework: Seismogram Processing Using the Cooley-Tukey FFT Algorithm and Numerical Integration
 
 **Author**: Luke Dinsdale (02205881)
+
 **Date**: March 2025
 
 ---

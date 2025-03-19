@@ -47,18 +47,24 @@ Results from example use cases are explored in the Jupyter notebook `Examples.ip
 When `main()` is called, the program lists files in the `/data/` directory and requests a file name:
 
 `>> Hello!`
+
 `>> Here are the files in \data:`
+
 `"Kocaeli.dat"`
+
 `"Loma_Prieta.dat"`
+
 `"Northridge.dat"`
+
 `"sine.txt"`
+
 `>> Enter a file to proceed with:`
 
 Enter `>> Loma_Prieta.dat` (not case-sensitive, but include the extension). Then:
 
 `>> Enter a sampling frequency (Hz): `
 
-From `Loma_Prieta.dat`, the sampling frequency is 100 Hz, so enter `>> 100`. $f_s$ must be a number greater than zero. The algorithm ignores redundancies due to central symmetry, so the peak output frequency is the Nyquist frequency ($f_s / 2$) by design.
+Looking at `Loma_Prieta.dat`, we can see that the sampling frequency is 100 Hz, so enter `>> 100`. $f_s$ must be a number greater than zero. The algorithm ignores redundancies due to central symmetry, so the peak output frequency is the Nyquist frequency ($f_s / 2$) by design.
 
 Next, the program provides information about the tapering constant and prompts:
 

@@ -90,15 +90,15 @@ Data are passed between classes using getters and setters to maintain encapsulat
 
 ### Workflow
 
-1. Two-column data are read from a user-specified file into a vector and copied into an $N \times 1$ array.
-2. $f_s$ and tapering parameter $k$ are read from the user.
-3. Data are transferred to an $N \times 2$ array of pointers, padded with zeros to length $2^n$. The first column is the real component, the second is imaginary (all zero for raw data).
+1. Two-column data (time, aceeleration) are read from a user-specified file into a vector and copied into an $N \times 1$ array.
+2. A ampling frequency $f_s$ and tapering parameter $k$ are read from the user.
+3. The data are transferred to an $N \times 2$ array of pointers, padded with zeros to length $2^n$. The first column is the real component, the second is imaginary (all zero for raw data).
 4. The forward FFT is computed using the "divide and conquer" method: a bit reversal stage orders the data, followed by a butterfly operation stage recombining odd and even parts, with twiddle factors updated iteratively.
-5. Data are integrated using the Fourier transform’s integration property, storing velocity and displacement spectra in new $N \times 2$ arrays.
-6. Velocity and displacement spectra undergo an inverse FFT to obtain time-domain records, stored in new $N \times 2$ arrays.
-7. Amplitudes are computed and assigned to frequency or time increment bins.
-8. Data are windowed (see [Windowing](#windowing)) to combat spectral leakage.
-9. If no results directory exists, one is created. Spectra and time-domain outputs are written to labeled `.txt` files.
+5. The data are integrated using the Fourier transform’s integration property, storing velocity and displacement spectra in new $N \times 2$ arrays.
+6. The velocity and displacement spectra undergo an inverse FFT to obtain time-domain records, stored in new $N \times 2$ arrays.
+7. Amplitudes of the complex data are computed and assigned to frequency or time increment bins.
+8. The data are windowed (see [Windowing](#windowing)) to combat spectral leakage.
+9. If no results directory exists, one is created. The spectra and time-domain outputs are written to labeled `.txt` files.
 
 ---
 

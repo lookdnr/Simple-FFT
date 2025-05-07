@@ -32,7 +32,7 @@ $$ \mathscr{F} \left[ \int f(t) \, dt \right] = \frac{F(\omega)}{i \omega}. $$
 
 This avoids the iterative approach required for time-domain integration, replacing it with simple algebraic operations, allowing efficient computation of velocity and displacement spectra from acceleration data.
 
-**Note**: My implementation is heavily influenced by *Numerical Recipes: The Art of Scientific Computing* (Press et al., 2007, 3rd ed.) and *An Introduction to Numerical Methods in C++* (Flowers, 2000). I also used StackExchange methods for listing files within a directory and resetting the input failbit, contributed by [Parker (2009)](https://stackoverflow.com/a/8520560) and [Greyfade (2011)](https://stackoverflow.com/a/58738) on lines 38 and 15 in `CFileHandling.cpp` and `CUserInput.cpp`, respectively.
+**Note**: My implementation is influenced by *Numerical Recipes: The Art of Scientific Computing* (Press et al., 2007, 3rd ed.) and *An Introduction to Numerical Methods in C++* (Flowers, 2000). I also used StackExchange methods for listing files within a directory and resetting the input failbit, contributed by [Parker (2009)](https://stackoverflow.com/a/8520560) and [Greyfade (2011)](https://stackoverflow.com/a/58738) on lines 38 and 15 in `CFileHandling.cpp` and `CUserInput.cpp`, respectively.
 
 ---
 

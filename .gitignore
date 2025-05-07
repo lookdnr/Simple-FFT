@@ -1,5 +1,5 @@
 # Ignore all .exe and .ipynb files in the project
 *.exe
 
-.ipynb
+*.ipynb
 

@@ -1,4 +1,4 @@
-#Seismogram Processing Using the Cooley-Tukey FFT Algorithm and Numerical Integration
+# Seismogram Processing Using the Cooley-Tukey FFT Algorithm and Numerical Integration
 
 **Author**: Luke Dinsdale (02205881)
 
